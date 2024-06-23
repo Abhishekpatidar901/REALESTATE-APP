@@ -19,7 +19,7 @@ export default function UserAdCard({ ad }) {
             />
 
             <div className="card-body">
-              <h3>${formatNumber(ad?.price)}</h3>
+              <h3>Rs.{formatNumber(ad?.price)}</h3>
               <p className="card-text">{ad?.address}</p>
 
               <AdFeatures ad={ad} />

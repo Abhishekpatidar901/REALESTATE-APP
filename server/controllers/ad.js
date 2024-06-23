@@ -3,8 +3,31 @@ import { nanoid } from "nanoid";
 import slugify from "slugify";
 import Ad from "../models/ad.js";
 import User from "../models/user.js";
-import { emailTemplate } from "../helpers/email.js";
+// import { emailTemplate } from "../helpers/email.js";
+import nodemailer from "nodemailer";
 
+
+const style = `
+    background: #eee;
+    padding: 20px;
+    border-radius: 20px;
+`;
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'developer.abhip01@gmail.com',
+    pass: 'urzxxlrkevedkxde' // Use the app password generated above
+  }
+});
+
+const emailTemplate = (email, content, replyTo, subject) => {
+  return {
+    from: replyTo,
+    to: email,
+    subject: subject,
+    html: content,
+  };
+};
 export const uploadImage = async (req, res) => {
   try {
     // console.log(req.body);
@@ -211,10 +234,39 @@ export const contactSeller = async (req, res) => {
       return res.json({ error: "Could not find user with that email" });
     } else {
       // send email
-      config.AWSSES.sendEmail(
-        emailTemplate(
-          ad.postedBy.email,
-          `
+      // config.AWSSES.sendEmail(
+      //   emailTemplate(
+      //     ad.postedBy.email,
+      //     `
+      //   <p>You have received a new customer enquiry</p>
+
+      //     <h4>Customer details</h4>
+      //     <p>Name: ${name}</p>
+      //     <p>Email: ${email}</p>
+      //     <p>Phone: ${phone}</p>
+      //     <p>Message: ${message}</p>
+
+      //   <a href="${config.CLIENT_URL}/ad/${ad.slug}">${ad.type} in ${ad.address} for ${ad.action} ${ad.price}</a>
+      //   `,
+      //     email,
+      //     "New enquiry received"
+      //   ),
+      //   (err, data) => {
+      //     if (err) {
+      //       console.log(err);
+      //       return res.json({ ok: false });
+      //     } else {
+      //       console.log(data);
+      //       return res.json({ ok: true });
+      //     }
+      //   }
+      // );
+      const mailOptions2 = emailTemplate(
+        email,
+        `
+            <html>
+             <div style="${style}">
+              <h1>Welcome to Realist App</h1>
         <p>You have received a new customer enquiry</p>
 
           <h4>Customer details</h4>
@@ -223,21 +275,23 @@ export const contactSeller = async (req, res) => {
           <p>Phone: ${phone}</p>
           <p>Message: ${message}</p>
 
-        <a href="${config.CLIENT_URL}/ad/${ad.slug}">${ad.type} in ${ad.address} for ${ad.action} ${ad.price}</a>
-        `,
-          email,
-          "New enquiry received"
-        ),
-        (err, data) => {
-          if (err) {
-            console.log(err);
-            return res.json({ ok: false });
-          } else {
-            console.log(data);
-            return res.json({ ok: true });
-          }
-        }
+          <a href="${config.CLIENT_URL}/ad/${ad.slug}">${ad.type} in ${ad.address} for ${ad.action} ${ad.price}</a>
+                               <p>&copy; ${new Date().getFullYear()}</p>
+                    </div>
+        </html>
+          `,
+        'developer.abhip01@gmail.com', // replace with your email
+        "New enquiry received"
       );
+      transporter.sendMail(mailOptions2, (err, info) => {
+        if (err) {
+          console.log(err);
+          return res.json({ ok: false });
+        } else {
+          console.log(info);
+          return res.json({ ok: true });
+        }
+      });
     }
   } catch (err) {
     console.log(err);

@@ -1,11 +1,36 @@
 import * as config from "../config.js";
 import jwt from "jsonwebtoken";
-import { emailTemplate } from "../helpers/email.js";
+// import { emailTemplate } from "../helpers/email.js";
 import { hashPassword, comparePassword } from "../helpers/auth.js";
 import User from "../models/user.js";
 import Ad from "../models/ad.js";
 import { nanoid } from "nanoid";
 import validator from "email-validator";
+import nodemailer from "nodemailer";
+
+const style = `
+    background: #eee;
+    padding: 20px;
+    border-radius: 20px;
+`;
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'developer.abhip01@gmail.com',
+    pass: 'urzxxlrkevedkxde' // Use the app password generated above
+  }
+});
+
+const emailTemplate = (email, content, replyTo, subject) => {
+  return {
+    from: replyTo,
+    to: email,
+    subject: subject,
+    html: content,
+  };
+};
+
 
 const tokenAndUserResponse = (req, res, user) => {
   const token = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
@@ -58,26 +83,50 @@ export const preRegister = async (req, res) => {
       expiresIn: "1h",
     });
 
-    config.AWSSES.sendEmail(
-      emailTemplate(
-        email,
-        `
+    // config.AWSSES.sendEmail(
+    //   emailTemplate(
+    //     email,
+    //     `
+    //   <p>Please click the link below to activate your account.</p>
+    //   <a href="${config.CLIENT_URL}/auth/account-activate/${token}">Activate my account</a>
+    //   `,
+    //     config.REPLY_TO,
+    //     "Activate your acount"
+    //   ),
+    //   (err, data) => {
+    //     if (err) {
+    //       console.log(err);
+    //       return res.json({ ok: false });
+    //     } else {
+    //       console.log(data);
+    //       return res.json({ ok: true });
+    //     }
+    //   }
+    // );
+    const mailOptions = emailTemplate(
+      email,
+      `
+       <html>
+                    <div style="${style}">
+                        <h1>Welcome to Realist App</h1>
       <p>Please click the link below to activate your account.</p>
       <a href="${config.CLIENT_URL}/auth/account-activate/${token}">Activate my account</a>
+                              <p>&copy; ${new Date().getFullYear()}</p>
+                    </div>
+        </html>
       `,
-        config.REPLY_TO,
-        "Activate your acount"
-      ),
-      (err, data) => {
-        if (err) {
-          console.log(err);
-          return res.json({ ok: false });
-        } else {
-          console.log(data);
-          return res.json({ ok: true });
-        }
-      }
+      'developer.abhip01@gmail.com', // replace with your email
+      "Activate your account"
     );
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.log(err);
+        return res.json({ ok: false });
+      } else {
+        console.log(info);
+        return res.json({ ok: true });
+      }
+    });
   } catch (err) {
     console.log(err);
     return res.json({ error: "Something went wrong. Try again." });
@@ -147,26 +196,50 @@ export const forgotPassword = async (req, res) => {
         expiresIn: "1h",
       });
 
-      config.AWSSES.sendEmail(
-        emailTemplate(
-          email,
-          `
+      // config.AWSSES.sendEmail(
+      //   emailTemplate(
+      //     email,
+      //     `
+      //     <p>Please click the link below to access your account.</p>
+      //     <a href="${config.CLIENT_URL}/auth/access-account/${token}">Access my account</a>
+      //   `,
+      //     config.REPLY_TO,
+      //     "Access your account"
+      //   ),
+      //   (err, data) => {
+      //     if (err) {
+      //       console.log(err);
+      //       return res.json({ ok: false });
+      //     } else {
+      //       console.log(data);
+      //       return res.json({ ok: true });
+      //     }
+      //   }
+      // );
+      const mailOptions1 = emailTemplate(
+        email,
+        `
+          <html>
+          <div style="${style}">
+          <h1>Welcome to Realist App</h1>
           <p>Please click the link below to access your account.</p>
           <a href="${config.CLIENT_URL}/auth/access-account/${token}">Access my account</a>
-        `,
-          config.REPLY_TO,
-          "Access your account"
-        ),
-        (err, data) => {
-          if (err) {
-            console.log(err);
-            return res.json({ ok: false });
-          } else {
-            console.log(data);
-            return res.json({ ok: true });
-          }
-        }
+          <p>&copy; ${new Date().getFullYear()}</p>
+          </div>
+          </html>
+          `,
+        'developer.abhip01@gmail.com', // replace with your email
+        "Access your account"
       );
+      transporter.sendMail(mailOptions1, (err, info) => {
+        if (err) {
+          console.log(err);
+          return res.json({ ok: false });
+        } else {
+          console.log(info);
+          return res.json({ ok: true });
+        }
+      });
     }
   } catch (err) {
     console.log(err);
