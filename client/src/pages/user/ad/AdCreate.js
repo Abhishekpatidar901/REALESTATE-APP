@@ -22,6 +22,9 @@ export default function AdCreate() {
     <div>
       <h1 className="display-1 bg-primary text-light p-5">Ad Create</h1>
       <Sidebar />
+     <br/>
+     <br/>
+     <br/>
 
       <div
         className="d-flex justify-content-center align-items-center vh-100"
