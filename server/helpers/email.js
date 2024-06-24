@@ -1,5 +1,8 @@
-import * as config from "../config.js";
+//email.js
 
+import dotenv from "dotenv";
+ 
+dotenv.config();
 const style = `
     background: #eee;
     padding: 20px;
@@ -8,7 +11,7 @@ const style = `
 
 export const emailTemplate = (email, content, replyTo, subject) => {
   return {
-    Source: config.EMAIL_FROM,
+    Source: process.env.EMAIL_FROM,
     Destination: {
       ToAddresses: [email],
     },

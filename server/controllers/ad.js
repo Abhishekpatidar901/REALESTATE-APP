@@ -1,11 +1,33 @@
-import * as config from "../config.js";
+//ad.js
+import dotenv from "dotenv";
+
 import { nanoid } from "nanoid";
 import slugify from "slugify";
 import Ad from "../models/ad.js";
 import User from "../models/user.js";
 // import { emailTemplate } from "../helpers/email.js";
 import nodemailer from "nodemailer";
+import SES from "aws-sdk/clients/ses.js";
+import  S3  from "aws-sdk/clients/s3.js";
+import NodeGeocoder from 'node-geocoder';
+dotenv.config();
 
+const awsConfig = {
+  accessKeyId : process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY,
+  region: "ap-southeast-2",
+  apiVersion: "2010-12-01",
+};
+
+const AWSS3 = new S3(awsConfig);
+
+const options = {
+  provider:'google',
+  apiKey:process.env.GOOGLE_API,
+  formatter: null
+};
+
+const GOOGLE_GEOCODER = NodeGeocoder(options);
 
 const style = `
     background: #eee;
@@ -49,7 +71,7 @@ export const uploadImage = async (req, res) => {
       ContentType: `image/${type}`,
     };
 
-    config.AWSS3.upload(params, (err, data) => {
+    AWSS3.upload(params, (err, data) => {
       if (err) {
         console.log(err);
         res.sendStatus(400);
@@ -68,7 +90,7 @@ export const removeImage = (req, res) => {
   try {
     const { Key, Bucket } = req.body;
 
-    config.AWSS3.deleteObject({ Bucket, Key }, (err, data) => {
+    AWSS3.deleteObject({ Bucket, Key }, (err, data) => {
       if (err) {
         console.log(err);
         res.sendStatus(400);
@@ -102,7 +124,7 @@ export const create = async (req, res) => {
       return res.json({ error: "Description is required" });
     }
 
-    const geo = await config.GOOGLE_GEOCODER.geocode(address);
+    const geo = await GOOGLE_GEOCODER.geocode(address);
     // console.log("geo => ", geo);
     const ad = await new Ad({
       ...req.body,
@@ -275,7 +297,7 @@ export const contactSeller = async (req, res) => {
           <p>Phone: ${phone}</p>
           <p>Message: ${message}</p>
 
-          <a href="${config.CLIENT_URL}/ad/${ad.slug}">${ad.type} in ${ad.address} for ${ad.action} ${ad.price}</a>
+          <a href="${process.env.CLIENT_URL}/ad/${ad.slug}">${ad.type} in ${ad.address} for ${ad.action} ${ad.price}</a>
                                <p>&copy; ${new Date().getFullYear()}</p>
                     </div>
         </html>
@@ -345,7 +367,7 @@ export const update = async (req, res) => {
         return res.json({ error: "Description are required" });
       }
 
-      const geo = await config.GOOGLE_GEOCODER.geocode(address);
+      const geo = await GOOGLE_GEOCODER.geocode(address);
 
       await ad.update({
         ...req.body,
@@ -434,7 +456,7 @@ export const search = async (req, res) => {
     console.log("req query", req.query);
     const { action, address, type, priceRange } = req.query;
 
-    const geo = await config.GOOGLE_GEOCODER.geocode(address);
+    const geo = await GOOGLE_GEOCODER.geocode(address);
     // console.log("geo => ", geo);
 
     const ads = await Ad.find({
