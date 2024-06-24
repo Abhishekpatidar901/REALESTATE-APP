@@ -40,7 +40,7 @@ const tokenAndUserResponse = (req, res, user) => {
   const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1h",
   });
-  const refreshToken = jwt.sign({ _id: user._id }, process.env.agentsJWT_SECRET, {
+  const refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 
