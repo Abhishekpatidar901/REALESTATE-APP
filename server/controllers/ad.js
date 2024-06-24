@@ -225,7 +225,7 @@ export const contactSeller = async (req, res) => {
   try {
     const { name, email, message, phone, adId } = req.body;
     const ad = await Ad.findById(adId).populate("postedBy", "email");
-
+    const owner_email = ad.postedBy.email;
     const user = await User.findByIdAndUpdate(req.user._id, {
       $addToSet: { enquiredProperties: adId },
     });
@@ -262,12 +262,12 @@ export const contactSeller = async (req, res) => {
       //   }
       // );
       const mailOptions2 = emailTemplate(
-        email,
+        owner_email,
         `
             <html>
              <div style="${style}">
               <h1>Welcome to Realist App</h1>
-        <p>You have received a new customer enquiry</p>
+        <p>You have received a new customer enquiry for the property ${ad.title}</p>
 
           <h4>Customer details</h4>
           <p>Name: ${name}</p>
