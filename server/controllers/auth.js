@@ -136,7 +136,7 @@ export const preRegister = async (req, res) => {
     return res.json({ error: "Something went wrong. Try again." });
   }
 };
-
+//for registering
 export const register = async (req, res) => {
   try {
     // console.log(req.body);
@@ -161,7 +161,7 @@ export const register = async (req, res) => {
     return res.json({ error: "Something went wrong. Try again." });
   }
 };
-
+//for login
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -183,7 +183,7 @@ export const login = async (req, res) => {
     return res.json({ error: "Something went wrong. Try again." });
   }
 };
-
+//for forgeting password
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -250,7 +250,7 @@ export const forgotPassword = async (req, res) => {
     return res.json({ error: "Something went wrong. Try again." });
   }
 };
-
+//to access account
 export const accessAccount = async (req, res) => {
   try {
     const { resetCode } = jwt.verify(req.body.resetCode, process.env.JWT_SECRET);
@@ -276,7 +276,7 @@ export const refreshToken = async (req, res) => {
     return res.status(403).json({ error: "Refresh token failed" });
   }
 };
-
+//To get current user
 export const currentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
@@ -300,7 +300,7 @@ export const publicProfile = async (req, res) => {
     return res.json({ error: "User not found" });
   }
 };
-
+//For updating password
 export const updatePassword = async (req, res) => {
   try {
     const { password } = req.body;
@@ -322,7 +322,7 @@ export const updatePassword = async (req, res) => {
     return res.status(403).json({ error: "Unauhorized" });
   }
 };
-
+//For updating profile
 export const updateProfile = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.user._id, req.body, {
