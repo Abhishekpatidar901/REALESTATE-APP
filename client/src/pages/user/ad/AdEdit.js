@@ -87,7 +87,7 @@ export default function AdEdit({ action, type }) {
       setAd({ ...ad, loading: true });
 
       const { data } = await axios.delete(`/ad/${ad._id}`);
-      // console.log("ad create response => ", data);
+      
       if (data?.error) {
         toast.error(data.error);
         setAd({ ...ad, loading: false });

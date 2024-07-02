@@ -276,6 +276,7 @@ export const refreshToken = async (req, res) => {
     return res.status(403).json({ error: "Refresh token failed" });
   }
 };
+
 //To get current user
 export const currentUser = async (req, res) => {
   try {
