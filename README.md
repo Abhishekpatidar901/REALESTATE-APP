@@ -1,3 +1,7 @@
+![image](https://github.com/Abhishekpatidar901/REALESTATE-APP/assets/46681150/992450aa-9090-4efd-8057-7edaf8e0fd45)
+
+
+
 # Realist - Real Estate Marketplace App
 
 ## Introduction
